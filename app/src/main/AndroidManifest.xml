@@ -15,23 +15,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-
+        <activity
+            android:name=".activity.HappyPlaceDetailActivity"
+            android:exported="false"
+        android:label="HAPPY PLACE DETAILS"
+        android:screenOrientation="portrait"
+        android:theme="@style/CustomNoActionBarTheme"/>
         <activity
             android:name=".activity.MainActivity"
-            android:screenOrientation="portrait"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.AddHappyPlaceActivity"
             android:label="ADD HAPPY PLACE"
             android:screenOrientation="portrait"
-            android:theme="@style/CustomNoActionBarTheme"/>
+            android:theme="@style/CustomNoActionBarTheme" />
     </application>
 
 </manifest>

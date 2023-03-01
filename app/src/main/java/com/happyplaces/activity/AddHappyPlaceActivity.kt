@@ -17,6 +17,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.startActivityForResult
 import com.happyplaces.R
 import com.happyplaces.database.DatabaseHandler
 import com.happyplaces.model.HappyPlaceModel
@@ -130,21 +131,13 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                         val dbHandler = DatabaseHandler(this)
                         val addHappyPlace = dbHandler.addHappyPlace(happyPlaceModel)
                         if (addHappyPlace > 0) {
-                            Toast.makeText(this, "Data inserted successfully", Toast.LENGTH_SHORT)
-                                .show()
-                            setResult(Activity.RESULT_OK);
-                            finish()//finishing activity
-                        }
-
-                        //Adding into database
-                      /*  if (mHappyPlaceDetails == null) {
-                            val addHappyPlace = dbHandler.addHappyPlace(happyPlaceModel)
-
                             if (addHappyPlace > 0) {
                                 setResult(Activity.RESULT_OK);
                                 finish()//finishing activity
                             }
-                        } else {
+                        }
+                        }
+                      /*else {
                             //Update into database
                             val updateHappyPlace = dbHandler.updateHappyPlace(happyPlaceModel)
 
@@ -159,7 +152,6 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
             }
         }
-    }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -232,7 +224,6 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun takePhotoFromCamera() {
-
         Dexter.withActivity(this)
             .withPermissions(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -303,3 +294,5 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         private const val IMAGE_DIRECTORY = "HappyPlacesImages"
     }
 }
+
+
