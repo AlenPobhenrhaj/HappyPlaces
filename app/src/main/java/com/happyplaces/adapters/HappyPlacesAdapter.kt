@@ -50,33 +50,18 @@ open class HappyPlacesAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
-
- /*   fun notifyEditItem(activity: Activity, position: Int, requestCode: Int) {
+    fun notifyEditItem(activity: Activity, position: Int, requestCode: Int) {
         val intent = Intent(context, AddHappyPlaceActivity::class.java)
         intent.putExtra(MainActivity.EXTRA_PLACE_DETAILS, list[position])
-        activity.startActivityForResult(
-            intent,
-            requestCode
-        )
+        activity.startActivityForResult(intent, requestCode)
 
         notifyItemChanged(position)
     }
 
 
-    fun removeAt(position: Int) {
-
-        val dbHandler = DatabaseHandler(context)
-        val isDeleted = dbHandler.deleteHappyPlace(list[position])
-
-        if (isDeleted > 0) {
-            list.removeAt(position)
-            notifyItemRemoved(position)
-        }
-    }*/
+    override fun getItemCount(): Int {
+        return list.size
+    }
 
 
     fun setOnClickListener(onClickListener: OnClickListener) {
