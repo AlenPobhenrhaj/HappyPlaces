@@ -58,6 +58,16 @@ open class HappyPlacesAdapter(
         notifyItemChanged(position)
     }
 
+    fun removeAt(position: Int) {
+
+        val dbHandler = DatabaseHandler(context)
+        val isDeleted = dbHandler.deleteHappyPlace(list[position])
+
+        if (isDeleted > 0) {
+            list.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
 
     override fun getItemCount(): Int {
         return list.size

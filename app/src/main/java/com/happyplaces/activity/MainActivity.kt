@@ -13,6 +13,7 @@ import com.happyplaces.R
 import com.happyplaces.adapters.HappyPlacesAdapter
 import com.happyplaces.database.DatabaseHandler
 import com.happyplaces.model.HappyPlaceModel
+import com.happyplaces.utils.SwipeToDeleteCallback
 import kotlinx.android.synthetic.main.activity_main.*
 import pl.kitek.rvswipetodelete.SwipeToEditCallback
 
@@ -94,6 +95,17 @@ class MainActivity : AppCompatActivity() {
 
         val editItemTouchHelper = ItemTouchHelper(editSwipeHandler)
         editItemTouchHelper.attachToRecyclerView(rv_happy_places_list)
+
+        val deleteSwipeHandler = object : SwipeToDeleteCallback(this) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = rv_happy_places_list.adapter as HappyPlacesAdapter
+                adapter.removeAt(viewHolder.adapterPosition)
+
+                getHappyPlacesListFromLocalDB() // Gets the latest list from the local database after item being delete from it.
+            }
+        }
+        val deleteItemTouchHelper = ItemTouchHelper(deleteSwipeHandler)
+        deleteItemTouchHelper.attachToRecyclerView(rv_happy_places_list)
 
 
     }

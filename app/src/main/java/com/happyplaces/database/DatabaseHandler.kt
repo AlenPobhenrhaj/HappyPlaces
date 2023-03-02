@@ -83,6 +83,14 @@ class DatabaseHandler(context: Context) :
         return success
     }
 
+    fun deleteHappyPlace(happyPlaceModel: HappyPlaceModel): Int {
+        val db = this.writableDatabase
+        // delete Row
+        val success =  db.delete(TABLE_HAPPY_PLACE, KEY_ID + "=" + happyPlaceModel.id, null )
+        db.close() // Closing database connection
+        return success
+    }
+
 
     fun getHappyPlacesList(): ArrayList<HappyPlaceModel> {
 
@@ -119,3 +127,4 @@ class DatabaseHandler(context: Context) :
         return happyPlaceList
     }
 }
+
