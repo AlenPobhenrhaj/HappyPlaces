@@ -61,14 +61,17 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_happy_place)
 
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        // Set up toolbar and navigation
         setSupportActionBar(toolbar_add_place)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar_add_place.setNavigationOnClickListener {
             onBackPressed()
         }
 
+        // Initialize Places API
         if (!Places.isInitialized()) {
             Places.initialize(
                 this@AddHappyPlaceActivity,
@@ -76,11 +79,13 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             )
         }
 
+        // If intent contains an extra with HappyPlaceModel data, set the activity to edit mode for update
         if (intent.hasExtra(MainActivity.EXTRA_PLACE_DETAILS)) {
             mHappyPlaceDetails =
                 intent.getParcelableExtra(MainActivity.EXTRA_PLACE_DETAILS) as HappyPlaceModel?
         }
 
+        // Set up date picker dialog listener and update the date view
         dateSetListener =
             DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
                 cal.set(Calendar.YEAR, year)
@@ -90,6 +95,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             }
 
         updateDateInView()
+        // If in edit mode, prepopulate fields with existing data for update
         if (mHappyPlaceDetails != null) {
             supportActionBar?.title = "Edit Happy Place"
 
@@ -106,6 +112,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
             btn_save.text = "UPDATE"
         }
+
+        // Set click listeners for date, image, location, and save button
         et_date.setOnClickListener(this)
         tv_add_image.setOnClickListener(this)
         btn_save.setOnClickListener (this)
@@ -113,8 +121,10 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         tv_select_current_location.setOnClickListener(this)
     }
 
+    // Handle clicks on various UI elements
     override fun onClick(v: View?) {
         when (v!!.id) {
+            // Handle click on date edit text field
             R.id.et_date -> {
                 DatePickerDialog(
                     this@AddHappyPlaceActivity,
@@ -124,7 +134,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     cal.get(Calendar.DAY_OF_MONTH)
                 ).show()
             }
-
+                // Handle click on add image text view
             R.id.tv_add_image -> {
                 val pictureDialog = AlertDialog.Builder(this)
                 pictureDialog.setTitle("Select Action")
@@ -132,7 +142,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     arrayOf("Select photo from gallery", "Capture photo from camera")
                 pictureDialog.setItems(
                     pictureDialogItems
-                ) { dialog, which ->
+                ) { _, which ->
                     when (which) {
                         0 -> choosePhotoFromGallery()
                         1 -> takePhotoFromCamera()
@@ -256,17 +266,22 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
+            // Check if the request code matches the Gallery request code
             if (requestCode == GALLERY) {
                 if (data != null) {
+                    // Get the URI of the selected image from the returned dat
                     val contentURI = data.data
                     try {
                         @Suppress("DEPRECATION")
+                        // Get the selected image bitmap from the URI using the content resolver
                         val selectedImageBitmap =
                             MediaStore.Images.Media.getBitmap(this.contentResolver, contentURI)
 
+                        // Save the selected image to internal storage and get its path
                          saveImageToInternalStorage = saveImageToInternalStorage(selectedImageBitmap)
                         Log.e("Saved Image : ", "Path :: $saveImageToInternalStorage")
 
+                        // Display the selected image in the image view
                         iv_place_image!!.setImageBitmap(selectedImageBitmap)
                     } catch (e: IOException) {
                         e.printStackTrace()
@@ -277,11 +292,14 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
             else if (requestCode == CAMERA) {
 
+                // Get the thumbnail image bitmap from the data extras
                 val thumbnail: Bitmap = data!!.extras!!.get("data") as Bitmap // Bitmap from camera
 
+                // Save the thumbnail image to internal storage and get its path
                  saveImageToInternalStorage = saveImageToInternalStorage(thumbnail)
                 Log.e("Saved Image : ", "Path :: $saveImageToInternalStorage")
 
+                // Display the thumbnail image in the image view
                 iv_place_image!!.setImageBitmap(thumbnail) // Set to the imageView.
             }
 
@@ -289,6 +307,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
                 val place: Place = Autocomplete.getPlaceFromIntent(data!!)
 
+                // Set the location text and latitude/longitude values based on the retrieved Place object
                 et_location.setText(place.address)
                 mLatitude = place.latLng!!.latitude
                 mLongitude = place.latLng!!.longitude
@@ -306,21 +325,24 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun choosePhotoFromGallery() {
-        Dexter.withActivity(this)
+        // Request permission to read from and write to external storage using the Dexter library
+        Dexter.withContext(this)
             .withPermissions(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
             .withListener(object : MultiplePermissionsListener {
+                // Handle the result of the permission request
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
 
+                    // Check if all permissions are granted
                     if (report!!.areAllPermissionsGranted()) {
-
+                        // If all permissions are granted, create an intent to pick an image from the gallery
                         val galleryIntent = Intent(
                             Intent.ACTION_PICK,
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                         )
-
+                        // Launch the gallery intent and specify the request code
                         startActivityForResult(galleryIntent, GALLERY)
                     }
                 }
@@ -362,20 +384,21 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun showRationalDialogForPermissions() {
+        // Create an alert dialog to inform the user that the required permissions are turned off
         AlertDialog.Builder(this)
             .setMessage("It Looks like you have turned off permissions required for this feature. It can be enabled under Application Settings")
-            .setPositiveButton("GO TO SETTINGS"
+            .setPositiveButton("GO TO SETTINGS" // Add a button to open the app settings
             ) { _, _ ->
                 try {
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS) // Create an intent to open the app settings
                     val uri = Uri.fromParts("package", packageName, null)
                     intent.data = uri
-                    startActivity(intent)
+                    startActivity(intent) // Launch the intent to open the app settings
                 } catch (e: ActivityNotFoundException) {
                     e.printStackTrace()
                 }
             }
-            .setNegativeButton("Cancel") { dialog,
+            .setNegativeButton("Cancel") { dialog,   // Add a cancel button to dismiss the dialog
                                            _ ->
                 dialog.dismiss()
             }.show()
